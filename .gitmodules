@@ -1,0 +1,3 @@
+[submodule "apps/suno-api"]
+	path = apps/suno-api
+	url = git@github.com:luisignaciocc/suno-api.git
