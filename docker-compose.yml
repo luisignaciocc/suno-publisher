@@ -10,3 +10,14 @@ services:
       - ./public:/app/public
     ports:
       - "3000:3000"
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    command: redis-server
+    volumes:
+      - cache:/data
+
+volumes:
+  cache:
+    driver: local
