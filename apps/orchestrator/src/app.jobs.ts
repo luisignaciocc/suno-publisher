@@ -158,6 +158,9 @@ export class AppJobs {
           this.logger.log(`Video created for song: ${audioId}`);
           fs.unlinkSync(imagePath);
           fs.unlinkSync(audioPath);
+          this.queue.add('upload-video', {
+            videoPath: outputPath,
+          });
           resolve(outputPath);
         })
         .on('error', (err) => {
@@ -166,5 +169,16 @@ export class AppJobs {
         })
         .save(outputPath);
     });
+  }
+
+  @Process('upload-video')
+  async uploadVideo(
+    job: Job<{
+      videoPath: string;
+    }>,
+  ) {
+    const videoPath = job.data.videoPath;
+
+    fs.unlinkSync(videoPath);
   }
 }
