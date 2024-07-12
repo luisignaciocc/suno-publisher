@@ -20,14 +20,14 @@ import { AppProducer } from './app.producer';
       },
     }),
     BullModule.registerQueue({
-      name: 'scrobbler',
+      name: 'publisher',
     }),
     BullBoardModule.forRoot({
       route: '/dashboard',
       adapter: ExpressAdapter,
     }),
     BullBoardModule.forFeature({
-      name: 'scrobbler',
+      name: 'publisher',
       adapter: BullMQAdapter,
     }),
   ],

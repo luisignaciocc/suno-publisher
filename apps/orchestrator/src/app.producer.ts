@@ -6,7 +6,7 @@ import { Queue } from 'bull';
 @Injectable()
 export class AppProducer {
   constructor(
-    @InjectQueue('scrobbler')
+    @InjectQueue('publisher')
     private readonly queue: Queue,
   ) {}
   private readonly logger = new Logger(AppProducer.name);

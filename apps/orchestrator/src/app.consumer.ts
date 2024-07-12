@@ -2,7 +2,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 
-@Processor('scrobbler')
+@Processor('publisher')
 export class AppConsumer {
   constructor() {}
   private readonly logger = new Logger(AppConsumer.name);
