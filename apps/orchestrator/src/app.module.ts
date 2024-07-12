@@ -6,16 +6,15 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { AppConsumer } from './app.consumer';
+import { AppJobs } from './app.jobs';
 import { AppController } from './app.controller';
-import { AppProducer } from './app.producer';
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     BullModule.forRoot({
       redis: {
-        host: 'redis',
+        host: 'localhost',
         port: 6379,
       },
     }),
@@ -32,7 +31,7 @@ import { AppProducer } from './app.producer';
     }),
   ],
   controllers: [AppController],
-  providers: [AppProducer, AppConsumer],
+  providers: [AppJobs],
   exports: [],
 })
 export class AppModule {}
