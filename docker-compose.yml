@@ -11,8 +11,8 @@ services:
     build:
       context: ./apps/orchestrator
     volumes:
-      - ./temp:/app/temp
-      - ./videos:/app/videos
+      - ./temp:/app/dist/temp
+      - ./videos:/app/dist/videos
     ports:
       - "4000:4000"
     env_file:
