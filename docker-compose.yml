@@ -6,10 +6,19 @@ services:
       context: ./apps/suno-api
       args:
         SUNO_COOKIE: ${SUNO_COOKIE}
+
+  orchestrator:
+    build:
+      context: ./apps/orchestrator
     volumes:
-      - ./public:/app/public
+      - ./temp:/app/temp
+      - ./videos:/app/videos
     ports:
-      - "3000:3000"
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
 
   redis:
     image: redis:6.2-alpine
@@ -17,8 +26,6 @@ services:
     command: redis-server
     volumes:
       - cache:/data
-    ports:
-      - "6379:6379"
 
 volumes:
   cache:

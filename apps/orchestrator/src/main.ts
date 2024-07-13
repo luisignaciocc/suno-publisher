@@ -5,10 +5,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const dashboardPassword = process.env.DASHBOARD_PASSWORD;
-  if (!dashboardPassword) {
-    throw new Error('DASHBOARD_PASSWORD is required');
-  }
   app.use(
     '/dashboard',
     basicAuth({
