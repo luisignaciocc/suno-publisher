@@ -13,8 +13,6 @@ services:
     volumes:
       - ./temp:/app/temp
       - ./videos:/app/videos
-      - ./credentials.json:/app/credentials.json
-      - ./token.json:/app/token.json
     ports:
       - "4000:4000"
     env_file:

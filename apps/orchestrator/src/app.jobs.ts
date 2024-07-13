@@ -14,7 +14,7 @@ import { cleanDirectory } from './utils/functions';
 
 const pipeline = promisify(stream.pipeline);
 
-const baseUrl = 'http://localhost:3000';
+const baseUrl = 'http://suno-api:3000';
 
 const TOKEN_PATH = 'token.json';
 const CREDENTIALS_PATH = 'credentials.json';
