@@ -8,8 +8,6 @@ export class AppController {
 
   @Get()
   getHello() {
-    return this.queue.add('create-video', {
-      songId: 'test',
-    });
+    return this.queue.add('create-song');
   }
 }
