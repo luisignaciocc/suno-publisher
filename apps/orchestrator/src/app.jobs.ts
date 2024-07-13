@@ -1,6 +1,6 @@
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import axios from 'axios';
 import * as fs from 'fs';
@@ -28,7 +28,7 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron(CronExpression.EVERY_DAY_AT_2PM, {
+  @Cron('0 0 * * 1,4,6', {
     name: 'start-jobs',
   })
   async scheduleCreateSong() {
@@ -47,10 +47,10 @@ export class AppJobs {
           {
             role: 'system',
             content: `
-            You are an assistant for generating hip hop instrumental structures. Use the following resources to create the instrumental structure, and ensure that the generated content does not exceed 3000 characters:
+            You are an assistant for generating hip hop instrumental structures. Use the following resources to create the instrumental structure, and ensure that the generated content does not exceed 2800 characters:
       
             1. **Meta Tags**:
-               - **Style and Genre**: Define the musical style, such as [Hip hop], [Rap], [Jazz], [Funk], [Soul], etc.
+               - **Style and Genre**: Define the musical style, such as [Lo-fi], [Chill], [Hip hop], [Jazz-hop], [Chillout], [Ambient], [Smooth jazz], [Downtempo], [Melodic], [Atmospheric], [Soulful], [Sample based].
                - **Dynamics**: Control volume, tempo, and emotion with tags.
                - **Instrumental Details**: Specify themes, instrumentation, and mood of the instrumental.
                
@@ -91,13 +91,13 @@ export class AppJobs {
                - Use specific prompts for accents and regional styles.
                - Write in the desired accent using colloquial terms and regional slang.
               
-            In each invocation, use a different combination of these resources to generate a unique instrumental structure.
+            In each invocation, use a combination of these resources to generate a unique instrumental structure within the specified styles.
             `,
           },
           {
             role: 'user',
             content: `
-            Generate a hip hop instrumental structure. The theme of the instrumental should be randomly selected and use a combination of the defined resources. Provide only the structure without any additional text
+            Generate a hip hop instrumental structure within the styles: lo-fi, chill, hip hop, jazz-hop, chillout, ambient, smooth jazz, downtempo, melodic, atmospheric, soulful, sample based, boom bap, funky, dj scratch. Provide only the structure without any additional text.
             `,
           },
         ],
@@ -138,13 +138,13 @@ export class AppJobs {
               - Use Title Case for descriptors.
               - Use lower case for instruments.
               
-              Ensure the tags are separated by commas and the result does not exceed 120 characters. Provide only the tags without any additional text.
+              Ensure the tags are separated by commas. Provide only the tags without any additional text.
               `,
             },
             {
               role: 'user',
               content: `
-              Generate tags for the following hip hop instrumental composition. Ensure the result does not exceed 100 characters:
+              Generate tags for the following hip hop instrumental composition:
               
               ${song}
               `,
@@ -157,9 +157,18 @@ export class AppJobs {
       const title = titleCompletion.choices[0].message.content
         .trim()
         .replace(/[^a-zA-Z0-9,-\s]/g, '');
+
+      let tagsCharCount = 0;
       const tags = tagsCompletion.choices[0].message.content
         .trim()
-        .replace(/[^a-zA-Z0-9,-\s]/g, '');
+        .replace(/[^a-zA-Z0-9,-\s]/g, '')
+        .split(',')
+        .filter((tag) => {
+          tagsCharCount += tag.length;
+          return tagsCharCount <= 100;
+        })
+        .join(',');
+
       job.progress(50);
 
       const payload = {
@@ -300,10 +309,10 @@ export class AppJobs {
     const dallePrompt = completion.choices[0].message.content.trim();
 
     const imageResponse = await this.openai.images.generate({
-      model: 'dall-e-2',
+      model: 'dall-e-3',
       prompt: dallePrompt,
       n: 1,
-      size: '1024x1024',
+      size: '1024x1792',
     });
 
     if (!imageResponse.data || imageResponse.data.length === 0) {
