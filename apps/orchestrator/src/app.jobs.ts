@@ -213,20 +213,21 @@ export class AppJobs {
       const data = response.data;
       job.progress(80);
 
-      const audio = data[Math.floor(Math.random() * data.length)];
       // this.logger.log(`Song created: ${audio.id}`);
-      job.log(`Song created: ${audio.id}`);
-      this.queue.add(
-        'create-video',
-        {
-          songId: audio.id,
-          title: `${title}`,
-        },
-        {
-          // delay of 10 minutes
-          delay: 1000 * 60 * 10,
-        },
-      );
+      data.forEach((audio, index) => {
+        job.log(`Song created: ${audio.id}`);
+        this.queue.add(
+          'create-video',
+          {
+            songId: audio.id,
+            title: `${title} - ${index + 1}`,
+          },
+          {
+            // delay of 10 minutes
+            delay: 1000 * 60 * (10 * index),
+          },
+        );
+      });
 
       job.progress(100);
       return data;
@@ -291,16 +292,12 @@ export class AppJobs {
         {
           role: 'system',
           content: `
-          You are an assistant for generating prompts for DALL-E 2 to create anime chill lo-fi style images. Use elements characteristic of anime, such as landscapes, samurais, cats, friends, etc. The prompt should describe a relaxing, atmospheric, and aesthetically pleasing scene. Return only the prompt without any additional text.
+          You are an assistant for generating prompts for DALL-E 2 to create anime chill lo-fi style images. Use elements characteristic of anime. The prompt should describe a relaxing, atmospheric, and aesthetically pleasing scene. Return only the prompt without any additional text.
           `,
         },
         {
           role: 'user',
-          content: `
-          Generate a DALL-E prompt for an anime chill lo-fi style image with the following title:
-          
-          ${title}
-          `,
+          content: `Generate a DALL-E prompt for an anime chill lo-fi style image`,
         },
       ],
       model: 'gpt-3.5-turbo',
@@ -427,7 +424,7 @@ export class AppJobs {
       job.log(`Uploading video to YouTube...`);
       job.progress(60);
 
-      await youtube.videos.insert({
+      const response = await youtube.videos.insert({
         part: ['snippet', 'status'],
         requestBody: {
           snippet: {
@@ -437,7 +434,7 @@ export class AppJobs {
             categoryId: '10',
           },
           status: {
-            privacyStatus: 'private',
+            privacyStatus: 'public',
             embeddable: true,
             license: 'youtube',
           },
@@ -446,6 +443,9 @@ export class AppJobs {
           body: fs.createReadStream(videoPath),
         },
       });
+
+      const videoId = response.data.id;
+      job.log(`Video uploaded to YouTube: ${videoId}`);
 
       job.progress(90);
 
