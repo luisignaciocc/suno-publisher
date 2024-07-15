@@ -1,6 +1,6 @@
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import axios from 'axios';
 import * as fs from 'fs';
@@ -28,7 +28,7 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron(CronExpression.EVERY_WEEKDAY, {
+  @Cron('0 0 * * 1,3', {
     name: 'start-jobs',
   })
   async scheduleCreateSong() {
@@ -47,7 +47,7 @@ export class AppJobs {
           {
             role: 'system',
             content: `
-            You are an assistant for generating hip hop instrumental structures. Use the following resources to create the instrumental structure, and ensure that the generated content does not exceed 2800 characters:
+            You are an assistant for generating lo-fi chill hip hop instrumental structures. Use the following resources to create the instrumental structure, ensuring the generated content does not exceed 2800 characters:
       
             1. **Meta Tags**:
                - **Style and Genre**: Define the musical style, such as [Lo-fi], [Chill], [Hip hop], [Jazz-hop], [Chillout], [Ambient], [Smooth jazz], [Downtempo], [Melodic], [Atmospheric], [Soulful], [Sample based].
@@ -55,12 +55,16 @@ export class AppJobs {
                - **Instrumental Details**: Specify themes, instrumentation, and mood of the instrumental.
                
             2. **Instrumental Sections**:
-               - Use annotations like [Drum Beat], [Bass Line], [Synth Melody], [Guitar Riff].
-               
+               - Use annotations like [Drum Beat], [Bass Line], [Synth Melody], [Guitar Riff], [Verse], [Chorus], [Break], [Instrumental Interlude], [Melodic Bass], [Percussion Break], [Syncopated Bass], [Fingerstyle Guitar Solo], [Build], [Bass Drop], [Melodic Flute Interlude], [Guitar solo], [Breakdown].
+      
             3. **Advanced Formatting**:
                - Use asterisks, brackets, and capitalization for effects, structure, and instrumental emphasis.
-               - Examples: *gunshots*, [Flute solo intro], [Increase intensity], [Crescendo], [Starts out quietly], [Whispering vocals], [Screaming vocals], [Emotional Bridge], etc.
-               
+               - Examples: [Flute solo intro], [Increase intensity], [Crescendo], [Starts out quietly], [Emotional Bridge], etc.
+               - Use text that can't be sung to force space between sections, such as unicode characters: 
+                 [Verse]
+                 ┳┻┳┻┳┻┳┻┳┻┳┻
+                 ┻┳┻┳┻┳┻┳┻┳┻┳
+      
             4. **Chord Progressions**:
                - Use tags to specify chord progressions like [Am], [F], [G], [Em].
                - Use mood descriptors to guide the choice of scales, such as "sad" for minor scales.
@@ -86,22 +90,18 @@ export class AppJobs {
                 [EMOTIONS: Peacefulness, Contemplation, Tranquillity, Nostalgia]
               </INSTRUMENTAL_DETAILS>
               
-            8. **Improve Performance in Hip Hop, Rap, and Trap**:
-               - Experiment with different genres and combinations.
-               - Use specific prompts for accents and regional styles.
-               - Write in the desired accent using colloquial terms and regional slang.
-              
-            In each invocation, use a combination of these resources to generate a unique instrumental structure within the specified styles.
+            8. **Instrumental Lyrics**:
+               - Use punctuation or onomatopoeic words to suggest instrumental sounds.
+               - Examples: [Percussion Break] . .! .. .! !! ... ! ! !, [sad trombone] waah-Waaah-WAAH, [chugging guitar] chuka-chuka-chuka-chuka.
             `,
           },
           {
             role: 'user',
-            content: `
-            Generate a hip hop instrumental structure within the styles: lo-fi, chill, hip hop, jazz-hop, chillout, ambient, smooth jazz, downtempo, melodic, atmospheric, soulful, sample based, boom bap, funky, dj scratch. Provide only the structure without any additional text.
-            `,
+            content: `Generate a lo-fi chill hip hop instrumental structure. Provide only the structure without any additional text.`,
           },
         ],
         model: 'gpt-3.5-turbo',
+        temperature: 2,
       });
 
       const song = songCompletion.choices[0].message.content;
