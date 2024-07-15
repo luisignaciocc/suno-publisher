@@ -112,17 +112,11 @@ export class AppJobs {
           messages: [
             {
               role: 'system',
-              content: `
-              You are an assistant for generating titles for hip hop instrumentals. Use the provided composition to come up with a fitting and catchy title for the instrumental. Ensure the title is concise, unique, and reflects the mood and style of the composition. Provide only the title without any additional text.
-              `,
+              content: `You are an assistant for generating a title for a lo-fi instrumental song. Generate a title that reflect the themes of lo-fi, chill, ambient and relax. Provide only the title without any additional text.`,
             },
             {
               role: 'user',
-              content: `
-              Generate a title for the following hip hop instrumental composition:
-              
-              ${song}
-              `,
+              content: `Generate a title for a lo-fi instrumental song`,
             },
           ],
           model: 'gpt-3.5-turbo',
@@ -132,22 +126,25 @@ export class AppJobs {
             {
               role: 'system',
               content: `
-              You are an assistant for generating tags for hip hop instrumentals. Use the provided composition to generate relevant tags. Follow these rules for the letter case:
+              You are an assistant for generating tags for a lo-fi instrumental song. Follow these rules for the letter case:
               
               - Use ALL CAPS for genres.
               - Use Title Case for descriptors.
               - Use lower case for instruments.
-              
+        
+              Include mood, sub-genre, and instruments. Use commas to separate tags. Examples:
+        
+              - Calm LO-FI, gentle piano, smooth beats
+              - Nostalgic Jazz, soft saxophone, chill vibes
+              - Relaxed Chillhop, mellow guitar, ambient sounds
+              - Peaceful Ambient, serene synth, background music
+        
               Ensure the tags are separated by commas. Provide only the tags without any additional text.
               `,
             },
             {
               role: 'user',
-              content: `
-              Generate tags for the following hip hop instrumental composition:
-              
-              ${song}
-              `,
+              content: `Generate tags for a lo-fi instrumental song`,
             },
           ],
           model: 'gpt-3.5-turbo',
@@ -173,7 +170,7 @@ export class AppJobs {
 
       const payload = {
         prompt: song,
-        tags: tags,
+        tags: tags + ', sample-based',
         title: title,
         make_instrumental: false,
         model: 'chirp-v3-5',
