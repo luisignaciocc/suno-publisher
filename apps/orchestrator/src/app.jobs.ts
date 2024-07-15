@@ -418,8 +418,18 @@ export class AppJobs {
       const youtube = google.youtube({ version: 'v3', auth: oAuth2Client });
 
       const title = job.data.title;
-      const description = '';
-      const tags = [];
+      const description = 'lo-fi chill hip hop instrumental beats to relax';
+      const tags = [
+        'lo-fi',
+        'chill',
+        'hip hop',
+        'instrumental',
+        'ambient',
+        'relaxing',
+        'atmospheric',
+        'chillhop',
+        'downtempo',
+      ];
 
       // this.logger.log(`Uploading video to YouTube...`);
       job.log(`Uploading video to YouTube...`);
