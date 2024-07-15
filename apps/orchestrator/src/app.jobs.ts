@@ -101,7 +101,7 @@ export class AppJobs {
           },
         ],
         model: 'gpt-3.5-turbo',
-        temperature: 2,
+        temperature: 1.5,
       });
 
       const song = songCompletion.choices[0].message.content;
@@ -148,6 +148,7 @@ export class AppJobs {
             },
           ],
           model: 'gpt-3.5-turbo',
+          temperature: 1.5,
         }),
       ]);
 
