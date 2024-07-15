@@ -1,6 +1,6 @@
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import axios from 'axios';
 import * as fs from 'fs';
@@ -28,7 +28,7 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron('0 0 * * 1,4,6', {
+  @Cron(CronExpression.EVERY_WEEKDAY, {
     name: 'start-jobs',
   })
   async scheduleCreateSong() {
@@ -38,7 +38,7 @@ export class AppJobs {
   @Process('create-song')
   async createSong(job: Job) {
     try {
-      this.logger.log(`Creating song...`);
+      // this.logger.log(`Creating song...`);
       job.log(`Creating song...`);
       job.progress(10);
 
@@ -180,7 +180,7 @@ export class AppJobs {
         wait_audio: false,
       };
 
-      this.logger.log(`Payload: ${JSON.stringify(payload)}`);
+      // this.logger.log(`Payload: ${JSON.stringify(payload)}`);
       job.log(`Payload: ${JSON.stringify(payload)}`);
 
       const url = `${baseUrl}/api/custom_generate`;
@@ -205,8 +205,11 @@ export class AppJobs {
       });
 
       if (response.status !== 200) {
-        this.logger.error(`Failed to create song`);
+        const error = response.data;
+        // this.logger.error(`Failed to create song`);
         job.log(`Failed to create song`);
+        job.log(`Error: ${error}`);
+        job.progress(0);
         return;
       }
 
@@ -214,7 +217,7 @@ export class AppJobs {
       job.progress(80);
 
       const audio = data[Math.floor(Math.random() * data.length)];
-      this.logger.log(`Song created: ${audio.id}`);
+      // this.logger.log(`Song created: ${audio.id}`);
       job.log(`Song created: ${audio.id}`);
       this.queue.add(
         'create-video',
@@ -250,7 +253,7 @@ export class AppJobs {
   ) {
     const audioId = job.data.songId;
     const title = job.data.title;
-    this.logger.log(`Creating video for song: ${audioId}`);
+    // this.logger.log(`Creating video for song: ${audioId}`);
     job.log(`Creating video for song: ${audioId}`);
     job.progress(10);
 
@@ -275,7 +278,7 @@ export class AppJobs {
     >(url);
 
     if (response.status !== 200) {
-      this.logger.error(`Failed to get song data`);
+      // this.logger.error(`Failed to get song data`);
       job.log(`Failed to get song data`);
       job.progress(0);
       return;
@@ -284,7 +287,7 @@ export class AppJobs {
     const song = response.data[0];
     job.progress(20);
 
-    this.logger.log(`Generating DALL-E 2 image...`);
+    // this.logger.log(`Generating DALL-E 2 image...`);
     job.log(`Generating DALL-E 2 image...`);
     const completion = await this.openai.chat.completions.create({
       messages: [
@@ -316,7 +319,7 @@ export class AppJobs {
     });
 
     if (!imageResponse.data || imageResponse.data.length === 0) {
-      this.logger.error(`Failed to generate image using DALL-E 2`);
+      // this.logger.error(`Failed to generate image using DALL-E 2`);
       job.log(`Failed to generate image using DALL-E 2`);
       job.progress(0);
       return;
@@ -326,7 +329,7 @@ export class AppJobs {
     const audioUrl = song.audio_url;
     job.progress(40);
 
-    this.logger.log(`Cleaning directories...`);
+    // this.logger.log(`Cleaning directories...`);
     job.log(`Cleaning directories...`);
     cleanDirectory(path.join(__dirname, 'temp'));
     cleanDirectory(path.join(__dirname, 'videos'));
@@ -335,7 +338,7 @@ export class AppJobs {
     const audioPath = path.join(__dirname, 'temp', `${audioId}.mp3`);
     const outputPath = path.join(__dirname, 'videos', `${audioId}.mp4`);
 
-    this.logger.log(`Downloading audio...`);
+    // this.logger.log(`Downloading audio...`);
     job.log(`Downloading audio...`);
     job.progress(50);
 
@@ -343,7 +346,7 @@ export class AppJobs {
     await pipeline(audioResponse.data, fs.createWriteStream(audioPath));
     job.progress(70);
 
-    this.logger.log(`Downloading generated image...`);
+    // this.logger.log(`Downloading generated image...`);
     job.log(`Downloading generated image...`);
     await pipeline(
       (await axios.get(imageUrl, { responseType: 'stream' })).data,
@@ -352,7 +355,7 @@ export class AppJobs {
     job.progress(80);
 
     return new Promise((resolve, reject) => {
-      this.logger.log(`Creating video...`);
+      // this.logger.log(`Creating video...`);
       job.log(`Creating video...`);
       job.progress(90);
 
@@ -366,7 +369,7 @@ export class AppJobs {
         .autopad(true, 'black')
         .outputOptions(['-pix_fmt yuv420p', '-shortest'])
         .on('end', () => {
-          this.logger.log(`Video created for song: ${audioId}`);
+          // this.logger.log(`Video created for song: ${audioId}`);
           job.log(`Video created for song: ${audioId}`);
           fs.unlinkSync(imagePath);
           fs.unlinkSync(audioPath);
@@ -378,8 +381,9 @@ export class AppJobs {
           resolve(outputPath);
         })
         .on('error', (err) => {
-          this.logger.error(`Error creating video for song: ${audioId}`, err);
+          // this.logger.error(`Error creating video for song: ${audioId}`, err);
           job.log(`Error creating video for song: ${audioId}`);
+          job.log(`Error: ${err}`);
           job.progress(0);
           reject(err);
         })
@@ -393,7 +397,7 @@ export class AppJobs {
       title: string;
     }>,
   ) {
-    this.logger.log(`Uploading video...`);
+    // this.logger.log(`Uploading video...`);
     job.log(`Uploading video...`);
     job.progress(10);
 
@@ -422,7 +426,7 @@ export class AppJobs {
       const description = '';
       const tags = [];
 
-      this.logger.log(`Uploading video to YouTube...`);
+      // this.logger.log(`Uploading video to YouTube...`);
       job.log(`Uploading video to YouTube...`);
       job.progress(60);
 
@@ -451,10 +455,10 @@ export class AppJobs {
       fs.unlinkSync(videoPath);
       job.progress(100);
 
-      this.logger.log(`Video uploaded and file deleted: ${videoPath}`);
+      // this.logger.log(`Video uploaded and file deleted: ${videoPath}`);
       job.log(`Video uploaded and file deleted: ${videoPath}`);
     } catch (error) {
-      this.logger.error(`Error uploading video: ${error.message}`, error.stack);
+      // this.logger.error(`Error uploading video: ${error.message}`, error.stack);
       job.log(`Error uploading video: ${error.message}`);
       job.progress(0);
       throw error;
