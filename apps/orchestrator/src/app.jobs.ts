@@ -225,7 +225,7 @@ export class AppJobs {
           },
           {
             // delay of 10 minutes
-            delay: 1000 * 60 * (10 * index),
+            delay: 1000 * 60 * 10 * (index + 1),
           },
         );
       });
