@@ -8,7 +8,11 @@ export class AppController {
 
   @Get()
   getHello() {
-    // return this.queue.add('create-song');
     return 'Hello World!';
+  }
+
+  @Get('trigger')
+  triggerJobs() {
+    return this.queue.add('create-song');
   }
 }
