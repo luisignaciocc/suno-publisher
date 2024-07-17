@@ -11,7 +11,7 @@ import * as ffmpeg from 'fluent-ffmpeg';
 import { promisify } from 'util';
 import * as stream from 'stream';
 import { cleanDirectory } from './utils/functions';
-import { loFiParams } from './utils/params';
+import { getProcessParams, ProcessType } from './utils/params';
 
 const pipeline = promisify(stream.pipeline);
 
@@ -33,18 +33,31 @@ export class AppJobs {
     name: 'start-jobs',
   })
   async scheduleCreateSong() {
-    this.queue.add('create-song');
+    const randomProcessType =
+      Object.values(ProcessType)[
+        Math.floor(Math.random() * Object.values(ProcessType).length)
+      ];
+    this.queue.add('create-song', {
+      processType: randomProcessType,
+    });
   }
 
   @Process('create-song')
-  async createSong(job: Job) {
+  async createSong(
+    job: Job<{
+      processType: ProcessType;
+    }>,
+  ) {
     try {
       // this.logger.log(`Creating song...`);
       job.log(`Creating song...`);
       job.progress(10);
 
+      const processType = job.data.processType;
+      const params = getProcessParams(processType);
+
       const songCompletion = await this.openai.chat.completions.create({
-        messages: loFiParams.songCompletionMessages,
+        messages: params.songCompletionMessages,
         model: 'gpt-3.5-turbo',
         temperature: 1.5,
       });
@@ -54,17 +67,17 @@ export class AppJobs {
 
       const [titleCompletion, tagsCompletion] = await Promise.all([
         this.openai.chat.completions.create({
-          messages: loFiParams.titleCompletionMessages,
+          messages: params.titleCompletionMessages,
           model: 'gpt-3.5-turbo',
         }),
         this.openai.chat.completions.create({
-          messages: loFiParams.tagsCompletionMessages,
+          messages: params.tagsCompletionMessages,
           model: 'gpt-3.5-turbo',
           temperature: 1.5,
         }),
       ]);
 
-      const title = loFiParams.getTitle(
+      const title = params.getTitle(
         titleCompletion.choices[0].message.content
           .trim()
           .replace(/[^a-zA-Z0-9,-\s]/g, ''),
@@ -136,6 +149,7 @@ export class AppJobs {
           {
             songId: audio.id,
             title: `${title} [${index + 1}]`,
+            processType: processType,
           },
           {
             // delay of 10 minutes
@@ -162,6 +176,7 @@ export class AppJobs {
     job: Job<{
       songId: string;
       title: string;
+      processType: ProcessType;
     }>,
   ) {
     const audioId = job.data.songId;
@@ -170,6 +185,8 @@ export class AppJobs {
     job.log(`Creating video for song: ${audioId}`);
     job.progress(10);
 
+    const processType = job.data.processType;
+    const params = getProcessParams(processType);
     const url = `${baseUrl}/api/get?ids=${audioId}`;
 
     const response = await axios.get<
@@ -203,7 +220,7 @@ export class AppJobs {
     // this.logger.log(`Generating DALL-E 2 image...`);
     job.log(`Generating DALL-E 2 image...`);
     const completion = await this.openai.chat.completions.create({
-      messages: loFiParams.createDallePromptCompletionMessages,
+      messages: params.createDallePromptCompletionMessages,
       model: 'gpt-3.5-turbo',
     });
 
@@ -274,6 +291,7 @@ export class AppJobs {
           this.queue.add('upload-video', {
             videoPath: outputPath,
             title,
+            processType,
           });
           job.progress(100);
           resolve(outputPath);
@@ -293,12 +311,15 @@ export class AppJobs {
     job: Job<{
       videoPath: string;
       title: string;
+      processType: ProcessType;
     }>,
   ) {
     // this.logger.log(`Uploading video...`);
     job.log(`Uploading video...`);
     job.progress(10);
 
+    const processType = job.data.processType;
+    const params = getProcessParams(processType);
     const videoPath = job.data.videoPath;
 
     try {
@@ -321,8 +342,8 @@ export class AppJobs {
       const youtube = google.youtube({ version: 'v3', auth: oAuth2Client });
 
       const title = job.data.title;
-      const description = loFiParams.videoDescription;
-      const tags = loFiParams.videoTags;
+      const description = params.videoDescription;
+      const tags = params.videoTags;
 
       // this.logger.log(`Uploading video to YouTube...`);
       job.log(`Uploading video to YouTube...`);
