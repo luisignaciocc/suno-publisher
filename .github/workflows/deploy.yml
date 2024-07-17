@@ -33,5 +33,6 @@ jobs:
             cd $REMOTE_DIR
             docker-compose down
             git pull
+            git submodule update --init --recursive
             docker-compose up --build -d
           EOF
