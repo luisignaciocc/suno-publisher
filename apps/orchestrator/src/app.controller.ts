@@ -1,6 +1,7 @@
 import { InjectQueue } from '@nestjs/bull';
 import { Controller, Get } from '@nestjs/common';
 import { Queue } from 'bull';
+import { getRandomTypeBeatStyles, ProcessType } from './utils/params';
 
 @Controller()
 export class AppController {
@@ -13,6 +14,14 @@ export class AppController {
 
   @Get('trigger')
   triggerJobs() {
-    return this.queue.add('create-song');
+    const randomProcessType =
+      Object.values(ProcessType)[
+        Math.floor(Math.random() * Object.values(ProcessType).length)
+      ];
+    const styles = getRandomTypeBeatStyles();
+    return this.queue.add('create-song', {
+      processType: randomProcessType,
+      styles,
+    });
   }
 }
