@@ -242,15 +242,15 @@ const getTypeBeatParams: (style1: string, style2: string) => ProcessParams = (
         - Use ALL CAPS for genres.
         - Use Title Case for descriptors.
         - Use lower case for instruments.
-
+  
         Include mood, sub-genre, and instruments. Use commas to separate tags. Examples:
-
+  
         - Energetic BOOM BAP, punchy drums, jazzy samples
         - Gritty OLD SCHOOL HIP HOP, vinyl scratches, street vibe
         - Bold 90s HIP HOP, funky bass line, raw beats
         - Nostalgic JAZZ-HOP, soulful piano, classic loops
-
-        Ensure the tags are separated by commas. Provide only the tags without any additional text.
+  
+        Ensure the tags are separated by commas. Provide only the tags without any additional text. Do not mention any producer or artist, only styles and vibes.
       `,
     },
     {
