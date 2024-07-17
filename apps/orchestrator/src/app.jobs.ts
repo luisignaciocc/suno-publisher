@@ -384,7 +384,8 @@ export class AppJobs {
       });
 
       const videoId = response.data.id;
-      job.log(`Video uploaded to YouTube: ${videoId}`);
+      job.log(`Video uploaded to YouTube`);
+      job.log(`https://www.youtube.com/watch?v=${videoId}&ab_channel=egnatius`);
 
       job.progress(90);
 
