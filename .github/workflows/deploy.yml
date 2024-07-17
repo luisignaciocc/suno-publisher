@@ -13,11 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Copy SSH key
+      - name: Install sshpass
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          sudo apt-get update
+          sudo apt-get install -y sshpass
 
       - name: Add SSH known hosts
         run: |
@@ -27,11 +26,11 @@ jobs:
         env:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           REMOTE_DIR: ~/suno-publisher
         run: |
-          ssh $REMOTE_USER@$REMOTE_HOST << EOF
+          sshpass -p $REMOTE_PASSWORD ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST << EOF
             cd $REMOTE_DIR
-            pwd
             docker-compose down
             git pull
             git submodule update --init --recursive
