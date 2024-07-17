@@ -2,9 +2,9 @@ import { youtube_v3 } from 'googleapis';
 import OpenAI from 'openai';
 
 export enum ProcessType {
-  LO_FI,
+  LO_FI = 'LO_FI',
   // BOOM_BAP,
-  TYPE_BEAT,
+  TYPE_BEAT = 'TYPE_BEAT',
 }
 
 type ProcessParams = {
