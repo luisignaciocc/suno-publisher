@@ -153,7 +153,7 @@ const loFiParams: ProcessParams = {
     'downtempo',
   ],
   getTitle: (title: string) => {
-    return `lo-fi chill instrumental - ${title}`;
+    return `lo-fi chill beat - ${title}`;
   },
 };
 
