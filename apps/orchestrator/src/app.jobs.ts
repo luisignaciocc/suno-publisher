@@ -11,7 +11,11 @@ import * as ffmpeg from 'fluent-ffmpeg';
 import { promisify } from 'util';
 import * as stream from 'stream';
 import { cleanDirectory } from './utils/functions';
-import { getProcessParams, ProcessType } from './utils/params';
+import {
+  getProcessParams,
+  getRandomTypeBeatStyles,
+  ProcessType,
+} from './utils/params';
 
 const pipeline = promisify(stream.pipeline);
 
@@ -37,8 +41,10 @@ export class AppJobs {
       Object.values(ProcessType)[
         Math.floor(Math.random() * Object.values(ProcessType).length)
       ];
+    const styles = getRandomTypeBeatStyles();
     this.queue.add('create-song', {
       processType: randomProcessType,
+      styles,
     });
   }
 
@@ -46,6 +52,7 @@ export class AppJobs {
   async createSong(
     job: Job<{
       processType: ProcessType;
+      styles: [string, string];
     }>,
   ) {
     try {
@@ -53,8 +60,9 @@ export class AppJobs {
       job.log(`Creating song...`);
       job.progress(10);
 
+      const styles = job.data.styles;
       const processType = job.data.processType;
-      const params = getProcessParams(processType);
+      const params = getProcessParams(processType, styles);
 
       const songCompletion = await this.openai.chat.completions.create({
         messages: params.songCompletionMessages,
@@ -150,6 +158,7 @@ export class AppJobs {
             songId: audio.id,
             title: `${title} [${index + 1}]`,
             processType: processType,
+            styles,
           },
           {
             // delay of 10 minutes
@@ -177,6 +186,7 @@ export class AppJobs {
       songId: string;
       title: string;
       processType: ProcessType;
+      styles: [string, string];
     }>,
   ) {
     const audioId = job.data.songId;
@@ -186,7 +196,8 @@ export class AppJobs {
     job.progress(10);
 
     const processType = job.data.processType;
-    const params = getProcessParams(processType);
+    const styles = job.data.styles;
+    const params = getProcessParams(processType, styles);
     const url = `${baseUrl}/api/get?ids=${audioId}`;
 
     const response = await axios.get<
@@ -292,6 +303,7 @@ export class AppJobs {
             videoPath: outputPath,
             title,
             processType,
+            styles,
           });
           job.progress(100);
           resolve(outputPath);
@@ -312,14 +324,16 @@ export class AppJobs {
       videoPath: string;
       title: string;
       processType: ProcessType;
+      styles: [string, string];
     }>,
   ) {
     // this.logger.log(`Uploading video...`);
     job.log(`Uploading video...`);
     job.progress(10);
 
+    const styles = job.data.styles;
     const processType = job.data.processType;
-    const params = getProcessParams(processType);
+    const params = getProcessParams(processType, styles);
     const videoPath = job.data.videoPath;
 
     try {
