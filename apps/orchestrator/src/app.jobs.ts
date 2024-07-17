@@ -29,7 +29,7 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron('0 0 * * 1,3', {
+  @Cron('0 0 * * 1,3,5', {
     name: 'start-jobs',
   })
   async scheduleCreateSong() {
