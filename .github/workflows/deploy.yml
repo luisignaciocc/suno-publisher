@@ -13,13 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install sshpass
+      - name: Set up SSH
         run: |
           sudo apt-get update
           sudo apt-get install -y sshpass
-
-      - name: Add SSH known hosts
-        run: |
+          mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy application
