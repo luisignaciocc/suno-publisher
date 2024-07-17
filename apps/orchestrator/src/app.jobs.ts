@@ -11,6 +11,7 @@ import * as ffmpeg from 'fluent-ffmpeg';
 import { promisify } from 'util';
 import * as stream from 'stream';
 import { cleanDirectory } from './utils/functions';
+import { loFiParams } from './utils/params';
 
 const pipeline = promisify(stream.pipeline);
 
@@ -43,63 +44,7 @@ export class AppJobs {
       job.progress(10);
 
       const songCompletion = await this.openai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: `
-            You are an assistant for generating lo-fi chill hip hop instrumental structures. Use the following resources to create the instrumental structure, ensuring the generated content does not exceed 2800 characters:
-      
-            1. **Meta Tags**:
-               - **Style and Genre**: Define the musical style, such as [Lo-fi], [Chill], [Hip hop], [Jazz-hop], [Chillout], [Ambient], [Smooth jazz], [Downtempo], [Melodic], [Atmospheric], [Soulful], [Sample based].
-               - **Dynamics**: Control volume, tempo, and emotion with tags.
-               - **Instrumental Details**: Specify themes, instrumentation, and mood of the instrumental.
-               
-            2. **Instrumental Sections**:
-               - Use annotations like [Drum Beat], [Bass Line], [Synth Melody], [Guitar Riff], [Verse], [Chorus], [Break], [Instrumental Interlude], [Melodic Bass], [Percussion Break], [Syncopated Bass], [Fingerstyle Guitar Solo], [Build], [Bass Drop], [Melodic Flute Interlude], [Guitar solo], [Breakdown].
-      
-            3. **Advanced Formatting**:
-               - Use asterisks, brackets, and capitalization for effects, structure, and instrumental emphasis.
-               - Examples: [Flute solo intro], [Increase intensity], [Crescendo], [Starts out quietly], [Emotional Bridge], etc.
-               - Use text that can't be sung to force space between sections, such as unicode characters: 
-                 [Verse]
-                 ┳┻┳┻┳┻┳┻┳┻┳┻
-                 ┻┳┻┳┻┳┻┳┻┳┻┳
-      
-            4. **Chord Progressions**:
-               - Use tags to specify chord progressions like [Am], [F], [G], [Em].
-               - Use mood descriptors to guide the choice of scales, such as "sad" for minor scales.
-               
-            5. **Natural Song Endings**:
-               - Use tags like [end], [fade out], [outro] to ensure a smooth and natural ending.
-               
-            6. **Sound Effects**:
-               - Use prompts in brackets in uppercase to indicate specific sounds like [BIRDS CHIRPING FX], [THUNDERSTORM FX].
-               
-            7. **Detailed Prompts**:
-               - Include a high-level description and reference details in the <INSTRUMENTAL_DETAILS></INSTRUMENTAL_DETAILS> tag.
-               - Example: 
-               <INSTRUMENTAL_DETAILS>
-                [GENRES: Chilled Lofi, Ambient, Downtempo]
-                [STYLE: Relaxing, Atmospheric, Lush, Clean]
-                [MOOD: Calm, Serene, Reflective, Dreamy]
-                [ARRANGEMENT: Slow tempo, Laid-back groove, Ethereal textures, Clean guitar melodies]
-                [INSTRUMENTATION: Clean electric guitar, Synthesizers, Ambient pads, Subtle percussion]
-                [TEMPO: Slow, 70-90 BPM]
-                [PRODUCTION: Lo-fi aesthetic, Warm tones, Soft compression, Analog warmth]
-                [DYNAMICS: Gentle throughout, Gradual builds and releases, Smooth transitions]
-                [EMOTIONS: Peacefulness, Contemplation, Tranquillity, Nostalgia]
-              </INSTRUMENTAL_DETAILS>
-              
-            8. **Instrumental Lyrics**:
-               - Use punctuation or onomatopoeic words to suggest instrumental sounds.
-               - Examples: [Percussion Break] . .! .. .! !! ... ! ! !, [sad trombone] waah-Waaah-WAAH, [chugging guitar] chuka-chuka-chuka-chuka.
-            `,
-          },
-          {
-            role: 'user',
-            content: `Generate a lo-fi chill hip hop instrumental structure. Provide only the structure without any additional text.`,
-          },
-        ],
+        messages: loFiParams.songCompletionMessages,
         model: 'gpt-3.5-turbo',
         temperature: 1.5,
       });
@@ -109,52 +54,21 @@ export class AppJobs {
 
       const [titleCompletion, tagsCompletion] = await Promise.all([
         this.openai.chat.completions.create({
-          messages: [
-            {
-              role: 'system',
-              content: `You are an assistant for generating a title for a lo-fi instrumental song. Generate a title that reflect the themes of lo-fi, chill, ambient and relax. Provide only the title without any additional text.`,
-            },
-            {
-              role: 'user',
-              content: `Generate a title for a lo-fi instrumental song`,
-            },
-          ],
+          messages: loFiParams.titleCompletionMessages,
           model: 'gpt-3.5-turbo',
         }),
         this.openai.chat.completions.create({
-          messages: [
-            {
-              role: 'system',
-              content: `
-              You are an assistant for generating tags for a lo-fi instrumental song. Follow these rules for the letter case:
-              
-              - Use ALL CAPS for genres.
-              - Use Title Case for descriptors.
-              - Use lower case for instruments.
-        
-              Include mood, sub-genre, and instruments. Use commas to separate tags. Examples:
-        
-              - Calm LO-FI, gentle piano, smooth beats
-              - Nostalgic Jazz, soft saxophone, chill vibes
-              - Relaxed Chillhop, mellow guitar, ambient sounds
-              - Peaceful Ambient, serene synth, background music
-        
-              Ensure the tags are separated by commas. Provide only the tags without any additional text.
-              `,
-            },
-            {
-              role: 'user',
-              content: `Generate tags for a lo-fi instrumental song`,
-            },
-          ],
+          messages: loFiParams.tagsCompletionMessages,
           model: 'gpt-3.5-turbo',
           temperature: 1.5,
         }),
       ]);
 
-      const title = titleCompletion.choices[0].message.content
-        .trim()
-        .replace(/[^a-zA-Z0-9,-\s]/g, '');
+      const title = loFiParams.getTitle(
+        titleCompletion.choices[0].message.content
+          .trim()
+          .replace(/[^a-zA-Z0-9,-\s]/g, ''),
+      );
 
       let tagsCharCount = 0;
       const tags = tagsCompletion.choices[0].message.content
@@ -221,7 +135,7 @@ export class AppJobs {
           'create-video',
           {
             songId: audio.id,
-            title: `${title} - ${index + 1}`,
+            title: `${title} [${index + 1}]`,
           },
           {
             // delay of 10 minutes
@@ -289,18 +203,7 @@ export class AppJobs {
     // this.logger.log(`Generating DALL-E 2 image...`);
     job.log(`Generating DALL-E 2 image...`);
     const completion = await this.openai.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: `
-          You are an assistant for generating prompts for DALL-E 2 to create anime chill lo-fi style images. Use elements characteristic of anime. The prompt should describe a relaxing, atmospheric, and aesthetically pleasing scene. Return only the prompt without any additional text.
-          `,
-        },
-        {
-          role: 'user',
-          content: `Generate a DALL-E prompt for an anime chill lo-fi style image`,
-        },
-      ],
+      messages: loFiParams.createDallePromptCompletionMessages,
       model: 'gpt-3.5-turbo',
     });
 
@@ -418,18 +321,8 @@ export class AppJobs {
       const youtube = google.youtube({ version: 'v3', auth: oAuth2Client });
 
       const title = job.data.title;
-      const description = 'lo-fi chill hip hop instrumental beats to relax';
-      const tags = [
-        'lo-fi',
-        'chill',
-        'hip hop',
-        'instrumental',
-        'ambient',
-        'relaxing',
-        'atmospheric',
-        'chillhop',
-        'downtempo',
-      ];
+      const description = loFiParams.videoDescription;
+      const tags = loFiParams.videoTags;
 
       // this.logger.log(`Uploading video to YouTube...`);
       job.log(`Uploading video to YouTube...`);
