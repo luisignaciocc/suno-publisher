@@ -401,7 +401,23 @@ const getTypeBeatParams: (style1: string, style2: string) => ProcessParams = (
   },
 });
 
-const typeBeatAvailableStyles = ['J Dilla', 'Madlib'];
+const typeBeatAvailableStyles = [
+  'J Dilla',
+  'Madlib',
+  'Dr. Dre',
+  'MF DOOM',
+  'Kanye West',
+  'DJ Premier',
+  'Pete Rock',
+  'RZA',
+  'Timbaland',
+  'Metro Boomin',
+  'Alchemist',
+  'Pharrell Williams',
+  'Jazz-hop',
+  'Trap',
+  'Funky',
+];
 
 export function getRandomTypeBeatStyles() {
   if (typeBeatAvailableStyles.length < 2) {
