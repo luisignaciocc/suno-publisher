@@ -66,7 +66,7 @@ export class AppJobs {
 
       const songCompletion = await this.openai.chat.completions.create({
         messages: params.songCompletionMessages,
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         temperature: 1.5,
       });
 
@@ -76,11 +76,11 @@ export class AppJobs {
       const [titleCompletion, tagsCompletion] = await Promise.all([
         this.openai.chat.completions.create({
           messages: params.titleCompletionMessages,
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o-mini',
         }),
         this.openai.chat.completions.create({
           messages: params.tagsCompletionMessages,
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o-mini',
           temperature: 1.5,
         }),
       ]);
@@ -232,7 +232,7 @@ export class AppJobs {
     job.log(`Generating DALL-E 2 image...`);
     const completion = await this.openai.chat.completions.create({
       messages: params.createDallePromptCompletionMessages,
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
     });
 
     const dallePrompt = completion.choices[0].message.content.trim();
