@@ -1,6 +1,6 @@
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import axios from 'axios';
 import * as fs from 'fs';
@@ -33,7 +33,7 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron('0 0 * * 1,3,5', {
+  @Cron(CronExpression.EVERY_WEEKDAY, {
     name: 'start-jobs',
   })
   async scheduleCreateSong() {
