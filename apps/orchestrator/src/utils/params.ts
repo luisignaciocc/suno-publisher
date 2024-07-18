@@ -51,10 +51,6 @@ const loFiParams: ProcessParams = {
           3. **Advanced Formatting**:
              - Use asterisks, brackets, and capitalization for effects, structure, and instrumental emphasis.
              - Examples: [Flute solo intro], [Increase intensity], [Crescendo], [Starts out quietly], [Emotional Bridge], etc.
-             - Use text that can't be sung to force space between sections, such as unicode characters: 
-               [Verse]
-               ┳┻┳┻┳┻┳┻┳┻┳┻
-               ┻┳┻┳┻┳┻┳┻┳┻┳
     
           4. **Chord Progressions**:
              - Use tags to specify chord progressions like [Am], [F], [G], [Em].
@@ -81,9 +77,6 @@ const loFiParams: ProcessParams = {
               [EMOTIONS: Peacefulness, Contemplation, Tranquillity, Nostalgia]
             </INSTRUMENTAL_DETAILS>
             
-          8. **Instrumental Lyrics**:
-             - Use punctuation or onomatopoeic words to suggest instrumental sounds.
-             - Examples: [Percussion Break] . .! .. .! !! ... ! ! !, [sad trombone] waah-Waaah-WAAH, [chugging guitar] chuka-chuka-chuka-chuka.
           `,
     },
     {
@@ -179,10 +172,6 @@ const getTypeBeatParams: (style1: string, style2: string) => ProcessParams = (
             3. **Advanced Formatting**:
                 - Use asterisks, brackets, and capitalization for effects, structure, and instrumental emphasis.
                 - Examples: [Vinyl Scratch Intro], [Increase intensity], [Crescendo], [Starts out quietly], [Emotional Bridge], etc.
-                - Use text that can't be sung to force space between sections, such as unicode characters: 
-                    [Verse]
-                    ┳┻┳┻┳┻┳┻┳┻┳┻
-                    ┻┳┻┳┻┳┻┳┻┳┻┳
 
             4. **Chord Progressions**:
                 - Use tags to specify chord progressions like [Am], [F], [G], [Em].
@@ -208,10 +197,6 @@ const getTypeBeatParams: (style1: string, style2: string) => ProcessParams = (
                         [DYNAMICS: Steady throughout, Occasional breaks, Smooth transitions]
                         [EMOTIONS: Confidence, Street vibe, Grit]
                     </INSTRUMENTAL_DETAILS>
-
-            8. **Instrumental Lyrics**:
-                - Use punctuation or onomatopoeic words to suggest instrumental sounds.
-                - Examples: [Percussion Break] boom-boom-BOOM, [Drum Beat] bap-bap-bap, [Vinyl Scratch] wicka-wicka.
         `,
     },
     {
