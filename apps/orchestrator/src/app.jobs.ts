@@ -33,8 +33,9 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron(CronExpression.EVERY_WEEKDAY, {
+  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_2PM, {
     name: 'start-jobs',
+    timeZone: 'America/Caracas',
   })
   async scheduleCreateSong() {
     const randomProcessType =
