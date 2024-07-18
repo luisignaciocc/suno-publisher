@@ -68,7 +68,6 @@ export class AppJobs {
       const songCompletion = await this.openai.chat.completions.create({
         messages: params.songCompletionMessages,
         model: 'gpt-4o-mini',
-        temperature: 1.5,
       });
 
       const song = songCompletion.choices[0].message.content;
@@ -82,7 +81,6 @@ export class AppJobs {
         this.openai.chat.completions.create({
           messages: params.tagsCompletionMessages,
           model: 'gpt-4o-mini',
-          temperature: 1.5,
         }),
       ]);
 
