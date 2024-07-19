@@ -26,8 +26,8 @@ export const getProcessParams = (
       return loFiParams;
     // case ProcessType.BOOM_BAP:
     //   return boomBapParams;
-    case ProcessType.TYPE_BEAT:
-      return getTypeBeatParams(styles[0], styles[1]);
+    // case ProcessType.TYPE_BEAT:
+    //  return getTypeBeatParams(styles[0], styles[1]);
     default:
       return loFiParams;
   }
