@@ -361,7 +361,7 @@ export class AppJobs {
         .on('end', () => {
           // this.logger.log(`Video created for song: ${audioId}`);
           job.log(`Video created for song: ${audioId}`);
-          fs.unlinkSync(imagePath);
+          // fs.unlinkSync(imagePath);
           fs.unlinkSync(audioPath);
           this.queue.add('upload-video', {
             videoPath: outputPath,
