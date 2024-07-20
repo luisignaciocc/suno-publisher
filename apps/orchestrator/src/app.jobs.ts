@@ -279,41 +279,41 @@ export class AppJobs {
     const song = response.data[0];
     job.progress(20);
 
-    // this.logger.log(`Generating DALL-E 2 image...`);
-    job.log(`Generating DALL-E 2 image...`);
-    const completion = await this.openai.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: `
-          You are an assistant for generating prompts for DALL-E 2 to create anime chill lo-fi style images. Use elements characteristic of anime. The prompt should describe a relaxing, atmospheric, and aesthetically pleasing scene. Return only the prompt without any additional text.
-          `,
-        },
-        {
-          role: 'user',
-          content: `Generate a DALL-E prompt for an anime chill lo-fi style image`,
-        },
-      ],
-      model: 'gpt-4o-mini',
-    });
+    // // this.logger.log(`Generating DALL-E 2 image...`);
+    // job.log(`Generating DALL-E 2 image...`);
+    // const completion = await this.openai.chat.completions.create({
+    //   messages: [
+    //     {
+    //       role: 'system',
+    //       content: `
+    //       You are an assistant for generating prompts for DALL-E 2 to create anime chill lo-fi style images. Use elements characteristic of anime. The prompt should describe a relaxing, atmospheric, and aesthetically pleasing scene. Return only the prompt without any additional text.
+    //       `,
+    //     },
+    //     {
+    //       role: 'user',
+    //       content: `Generate a DALL-E prompt for an anime chill lo-fi style image`,
+    //     },
+    //   ],
+    //   model: 'gpt-4o-mini',
+    // });
 
-    const dallePrompt = completion.choices[0].message.content.trim();
+    // const dallePrompt = completion.choices[0].message.content.trim();
 
-    const imageResponse = await this.openai.images.generate({
-      model: 'dall-e-3',
-      prompt: dallePrompt,
-      n: 1,
-      size: '1792x1024',
-    });
+    // const imageResponse = await this.openai.images.generate({
+    //   model: 'dall-e-3',
+    //   prompt: dallePrompt,
+    //   n: 1,
+    //   size: '1792x1024',
+    // });
 
-    if (!imageResponse.data || imageResponse.data.length === 0) {
-      // this.logger.error(`Failed to generate image using DALL-E 2`);
-      job.log(`Failed to generate image using DALL-E 2`);
-      job.progress(0);
-      return;
-    }
+    // if (!imageResponse.data || imageResponse.data.length === 0) {
+    //   // this.logger.error(`Failed to generate image using DALL-E 2`);
+    //   job.log(`Failed to generate image using DALL-E 2`);
+    //   job.progress(0);
+    //   return;
+    // }
 
-    const imageUrl = imageResponse.data[0].url;
+    // const imageUrl = imageResponse.data[0].url;
     const audioUrl = song.audio_url;
     job.progress(40);
 
@@ -322,7 +322,8 @@ export class AppJobs {
     cleanDirectory(path.join(__dirname, 'temp'));
     cleanDirectory(path.join(__dirname, 'videos'));
 
-    const imagePath = path.join(__dirname, 'temp', `${audioId}.png`);
+    // const imagePath = path.join(__dirname, 'temp', `${audioId}.png`);
+    const imagePath = path.join(__dirname, 'images', `lofi_image.png`);
     const audioPath = path.join(__dirname, 'temp', `${audioId}.mp3`);
     const outputPath = path.join(__dirname, 'videos', `${audioId}.mp4`);
 
@@ -334,12 +335,12 @@ export class AppJobs {
     await pipeline(audioResponse.data, fs.createWriteStream(audioPath));
     job.progress(70);
 
-    // this.logger.log(`Downloading generated image...`);
-    job.log(`Downloading generated image...`);
-    await pipeline(
-      (await axios.get(imageUrl, { responseType: 'stream' })).data,
-      fs.createWriteStream(imagePath),
-    );
+    // // this.logger.log(`Downloading generated image...`);
+    // job.log(`Downloading generated image...`);
+    // await pipeline(
+    //   (await axios.get(imageUrl, { responseType: 'stream' })).data,
+    //   fs.createWriteStream(imagePath),
+    // );
     job.progress(80);
 
     return new Promise((resolve, reject) => {
