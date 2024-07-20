@@ -11,7 +11,10 @@ const TOKEN_PATH = 'token.json';
 async function getAccessToken(oAuth2Client) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/youtube.upload'],
+    scope: [
+      'https://www.googleapis.com/auth/youtube.upload',
+      'https://www.googleapis.com/auth/youtube',
+    ],
   });
   console.log('Authorize this app by visiting this url:', authUrl);
   const rl = readline.createInterface({

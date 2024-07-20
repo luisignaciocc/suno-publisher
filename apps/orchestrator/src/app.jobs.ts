@@ -11,11 +11,7 @@ import * as ffmpeg from 'fluent-ffmpeg';
 import { promisify } from 'util';
 import * as stream from 'stream';
 import { cleanDirectory } from './utils/functions';
-import {
-  getProcessParams,
-  getRandomTypeBeatStyles,
-  ProcessType,
-} from './utils/params';
+import { getProcessParams, YoutubePlaylist } from './utils/params';
 
 const pipeline = promisify(stream.pipeline);
 
@@ -38,32 +34,17 @@ export class AppJobs {
     timeZone: 'America/Caracas',
   })
   async scheduleCreateSong() {
-    const randomProcessType =
-      Object.values(ProcessType)[
-        Math.floor(Math.random() * Object.values(ProcessType).length)
-      ];
-    const styles = getRandomTypeBeatStyles();
-    this.queue.add('create-song', {
-      processType: randomProcessType,
-      styles,
-    });
+    this.queue.add('create-song');
   }
 
   @Process('create-song')
-  async createSong(
-    job: Job<{
-      processType: ProcessType;
-      styles: [string, string];
-    }>,
-  ) {
+  async createSong(job: Job) {
     try {
       // this.logger.log(`Creating song...`);
       job.log(`Creating song...`);
       job.progress(10);
 
-      const styles = job.data.styles;
-      const processType = job.data.processType;
-      const params = getProcessParams(processType, styles);
+      const params = getProcessParams();
 
       const songCompletion = await this.openai.chat.completions.create({
         messages: params.songCompletionMessages,
@@ -156,8 +137,6 @@ export class AppJobs {
           {
             songId: audio.id,
             title: `${title} [${index + 1}]`,
-            processType: processType,
-            styles,
           },
           {
             // delay of 10 minutes
@@ -184,8 +163,6 @@ export class AppJobs {
     job: Job<{
       songId: string;
       title: string;
-      processType: ProcessType;
-      styles: [string, string];
     }>,
   ) {
     const audioId = job.data.songId;
@@ -194,9 +171,7 @@ export class AppJobs {
     job.log(`Creating video for song: ${audioId}`);
     job.progress(10);
 
-    const processType = job.data.processType;
-    const styles = job.data.styles;
-    const params = getProcessParams(processType, styles);
+    const params = getProcessParams();
     const url = `${baseUrl}/api/get?ids=${audioId}`;
 
     const response = await axios.get<
@@ -301,8 +276,6 @@ export class AppJobs {
           this.queue.add('upload-video', {
             videoPath: outputPath,
             title,
-            processType,
-            styles,
           });
           job.progress(100);
           resolve(outputPath);
@@ -322,17 +295,13 @@ export class AppJobs {
     job: Job<{
       videoPath: string;
       title: string;
-      processType: ProcessType;
-      styles: [string, string];
     }>,
   ) {
     // this.logger.log(`Uploading video...`);
     job.log(`Uploading video...`);
     job.progress(10);
 
-    const styles = job.data.styles;
-    const processType = job.data.processType;
-    const params = getProcessParams(processType, styles);
+    const params = getProcessParams();
     const videoPath = job.data.videoPath;
 
     try {
@@ -350,7 +319,7 @@ export class AppJobs {
         redirect_uris[0],
       );
       oAuth2Client.setCredentials(token);
-      job.progress(40);
+      job.progress(25);
 
       const youtube = google.youtube({ version: 'v3', auth: oAuth2Client });
 
@@ -360,7 +329,7 @@ export class AppJobs {
 
       // this.logger.log(`Uploading video to YouTube...`);
       job.log(`Uploading video to YouTube...`);
-      job.progress(60);
+      job.progress(25);
 
       const response = await youtube.videos.insert({
         part: ['snippet', 'status'],
@@ -386,7 +355,21 @@ export class AppJobs {
       job.log(`Video uploaded to YouTube`);
       job.log(`https://www.youtube.com/watch?v=${videoId}&ab_channel=egnatius`);
 
-      job.progress(90);
+      job.log(`Adding the video to the playlist...`);
+      job.progress(75);
+
+      await youtube.playlistItems.insert({
+        part: ['snippet'],
+        requestBody: {
+          snippet: {
+            playlistId: YoutubePlaylist.LO_FI,
+            resourceId: {
+              kind: 'youtube#video',
+              videoId: videoId,
+            },
+          },
+        },
+      });
 
       fs.unlinkSync(videoPath);
       job.progress(100);
