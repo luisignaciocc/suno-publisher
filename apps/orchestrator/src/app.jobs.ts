@@ -324,7 +324,7 @@ export class AppJobs {
     cleanDirectory(path.join(__dirname, 'videos'));
 
     // const imagePath = path.join(__dirname, 'temp', `${audioId}.png`);
-    const imagePath = path.join(__dirname, 'images', `lofi_image.png`);
+    const imagePath = path.join(__dirname, '..', 'images', `lofi_image.png`);
     const audioPath = path.join(__dirname, 'temp', `${audioId}.mp3`);
     const outputPath = path.join(__dirname, 'videos', `${audioId}.mp4`);
 

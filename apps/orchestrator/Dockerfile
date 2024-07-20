@@ -14,6 +14,4 @@ COPY credentials.json token.json ./
 
 RUN npm run build
 
-RUN mkdir -p dist/images && cp -r images/* dist/images/
-
 CMD [ "npm", "run", "start:prod" ]
