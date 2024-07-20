@@ -163,8 +163,7 @@ export class AppJobs {
       job.progress(50);
 
       const payload = {
-        // prompt: song,
-        prompt: '',
+        prompt: '/',
         tags: tags,
         title: title,
         make_instrumental: true,
@@ -227,6 +226,7 @@ export class AppJobs {
       job.progress(100);
       return data;
     } catch (error) {
+      this.logger.error(error);
       this.logger.error(
         `Error in createSong job: ${error.message}`,
         error.stack,
