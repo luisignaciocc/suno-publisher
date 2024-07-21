@@ -29,7 +29,7 @@ export class AppJobs {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_2PM, {
+  @Cron(CronExpression.EVERY_DAY_AT_9AM, {
     name: 'start-jobs',
     timeZone: 'America/Caracas',
   })
@@ -120,7 +120,7 @@ export class AppJobs {
             {
               role: 'system',
               content: `
-              You are an assistant for generating tags for a lo-fi beat. Follow these rules for the letter case:
+              You are an assistant for generating tags for a lofi beat. Follow these rules for the letter case:
               
               - Use ALL CAPS for genres.
               - Use Title Case for descriptors.
@@ -128,7 +128,7 @@ export class AppJobs {
         
               Include mood, sub-genre, and instruments. Use commas to separate tags. Examples:
         
-              - Calm LO-FI, gentle piano, smooth beats
+              - Calm LOFI, gentle piano, smooth beats
               - Nostalgic Jazz, soft saxophone, chill vibes
               - Relaxed Chillhop, mellow guitar, ambient sounds
               - Peaceful Ambient, serene synth, background music
@@ -138,7 +138,7 @@ export class AppJobs {
             },
             {
               role: 'user',
-              content: `Generate tags for a lo-fi instrumental song`,
+              content: `Generate tags for a lofi beat`,
             },
           ],
           model: 'gpt-4o-mini',
