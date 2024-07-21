@@ -105,7 +105,7 @@ export class AppJobs {
           messages: [
             {
               role: 'system',
-              content: `You are an assistant for generating a title for a jazz instrumental beat. Generate a title that reflects the themes of jazz, smoothness, and sophistication. Provide only the title without any additional text, the title should consist of two words`,
+              content: `You are an assistant for generating a title for a jazz instrumental beat. Generate a title that contains a wordplay involving the word jazz or jazzy or similar. Provide only the title without any additional text.`,
             },
             {
               role: 'user',
@@ -325,7 +325,7 @@ export class AppJobs {
     cleanDirectory(path.join(__dirname, 'videos'));
 
     // const imagePath = path.join(__dirname, 'temp', `${audioId}.png`);
-    const imagePath = path.join(__dirname, '..', 'images', `lofi_image.png`);
+    const imagePath = path.join(__dirname, '..', 'images', `jazz.png`);
     const audioPath = path.join(__dirname, 'temp', `${audioId}.mp3`);
     const outputPath = path.join(__dirname, 'videos', `${audioId}.mp4`);
 
