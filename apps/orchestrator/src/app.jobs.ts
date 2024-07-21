@@ -106,7 +106,7 @@ export class AppJobs {
           messages: [
             {
               role: 'system',
-              content: `You are an assistant for generating a title for a lo-fi beat. Generate a title that reflect the themes of lo-fi, chill hip-hop. Provide only the title without any additional text, ensuring the generated text does not exceed 120 characters`,
+              content: `You are an assistant for generating a title for a lofi beat. Generate a title that reflect the themes of lofi, chill hip-hop. Provide only the title without any additional text, the title should consist of two words`,
             },
             {
               role: 'user',
@@ -114,6 +114,7 @@ export class AppJobs {
             },
           ],
           model: 'gpt-4o-mini',
+          temperature: 1.3,
         }),
         this.openai.chat.completions.create({
           messages: [
