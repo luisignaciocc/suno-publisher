@@ -128,17 +128,17 @@ export class AppJobs {
         
               Include mood, sub-genre, and instruments. Use commas to separate tags. Examples:
         
-              - Sophisticated JAZZ, smooth saxophone, lively rhythms
-              - Relaxed SMOOTH JAZZ, gentle piano, chill vibes
-              - Upbeat FUSION, vibrant trumpet, energetic drums
-              - Mellow COOL JAZZ, soft bass, calm atmosphere
+              - Calm LOFI, gentle piano, smooth beats
+              - Nostalgic Jazz, soft saxophone, chill vibes
+              - Relaxed Chillhop, mellow guitar, ambient sounds
+              - Peaceful Ambient, serene synth, background music
         
               Ensure the tags are separated by commas. Provide only the tags without any additional text.
               `,
             },
             {
               role: 'user',
-              content: `Generate tags for a chill hop jazz instrumental beat, easy to listen to, suitable for studying or relaxing, with hip hop elements.`,
+              content: `Generate tags for a chill jazz instrumental.`,
             },
           ],
           model: 'gpt-4o-mini',
