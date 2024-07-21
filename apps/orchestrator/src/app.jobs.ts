@@ -44,60 +44,60 @@ export class AppJobs {
       job.log(`Creating song...`);
       job.progress(10);
 
-      const songCompletion = await this.openai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: `
-                You are an assistant for generating jazz instrumental structures. Use the following resources to create the instrumental structure, ensuring the generated content does not exceed 2800 characters:
-      
-                1. **Meta Tags**:
-                   - **Style and Genre**: Define the musical style, such as [Jazz], [Smooth Jazz], [Bebop], [Swing], [Cool Jazz], [Fusion], [Latin Jazz], [Free Jazz], [Hard Bop].
-                   - **Dynamics**: Control volume, tempo, and emotion with tags.
-                   - **Instrumental Details**: Specify themes, instrumentation, and mood of the instrumental.
-      
-                2. **Instrumental Sections**:
-                   - Use annotations like [Drum Beat], [Bass Line], [Piano Melody], [Saxophone Solo], [Trumpet Riff], [Verse], [Chorus], [Break], [Instrumental Interlude], [Melodic Bass], [Percussion Break], [Syncopated Bass], [Fingerstyle Guitar Solo], [Build], [Bass Drop], [Melodic Flute Interlude], [Guitar solo], [Breakdown].
-      
-                3. **Advanced Formatting**:
-                   - Use asterisks, brackets, and capitalization for effects, structure, and instrumental emphasis.
-                   - Examples: [Saxophone solo intro], [Increase intensity], [Crescendo], [Starts out quietly], [Emotional Bridge], etc.
-      
-                4. **Chord Progressions**:
-                   - Use tags to specify chord progressions like [Cmaj7], [Dm7], [G7], [A7].
-                   - Use mood descriptors to guide the choice of scales, such as "smooth" for major scales.
-      
-                5. **Natural Song Endings**:
-                   - Use tags like [end], [fade out], [outro] to ensure a smooth and natural ending.
-      
-                6. **Sound Effects**:
-                   - Use prompts in brackets in uppercase to indicate specific sounds like [APPLAUSE FX], [AMBIENT CLUB NOISE FX].
-      
-                7. **Detailed Prompts**:
-                   - Include a high-level description and reference details in the <INSTRUMENTAL_DETAILS></INSTRUMENTAL_DETAILS> tag.
-                   - Example:
-                   <INSTRUMENTAL_DETAILS>
-                    [GENRES: Smooth Jazz, Cool Jazz, Fusion]
-                    [STYLE: Relaxing, Melodic, Improvisational, Clean]
-                    [MOOD: Calm, Sophisticated, Reflective, Dreamy]
-                    [ARRANGEMENT: Moderate tempo, Laid-back groove, Ethereal textures, Smooth melodies]
-                    [INSTRUMENTATION: Saxophone, Piano, Double Bass, Drums, Trumpet]
-                    [TEMPO: Moderate, 80-120 BPM]
-                    [PRODUCTION: Warm tones, Clean mixing, Subtle compression]
-                    [DYNAMICS: Gentle throughout, Gradual builds and releases, Smooth transitions]
-                    [EMOTIONS: Sophistication, Contemplation, Tranquillity, Nostalgia]
-                  </INSTRUMENTAL_DETAILS>
-                `,
-          },
-          {
-            role: 'user',
-            content: `Generate a jazz instrumental structure. Provide only the structure without any additional text.`,
-          },
-        ],
-        model: 'gpt-4o-mini',
-      });
+      // const songCompletion = await this.openai.chat.completions.create({
+      //   messages: [
+      //     {
+      //       role: 'system',
+      //       content: `
+      //           You are an assistant for generating jazz instrumental structures. Use the following resources to create the instrumental structure, ensuring the generated content does not exceed 2800 characters:
 
-      const song = songCompletion.choices[0].message.content;
+      //           1. **Meta Tags**:
+      //              - **Style and Genre**: Define the musical style, such as [Jazz], [Smooth Jazz], [Bebop], [Swing], [Cool Jazz], [Fusion], [Latin Jazz], [Free Jazz], [Hard Bop].
+      //              - **Dynamics**: Control volume, tempo, and emotion with tags.
+      //              - **Instrumental Details**: Specify themes, instrumentation, and mood of the instrumental.
+
+      //           2. **Instrumental Sections**:
+      //              - Use annotations like [Drum Beat], [Bass Line], [Piano Melody], [Saxophone Solo], [Trumpet Riff], [Verse], [Chorus], [Break], [Instrumental Interlude], [Melodic Bass], [Percussion Break], [Syncopated Bass], [Fingerstyle Guitar Solo], [Build], [Bass Drop], [Melodic Flute Interlude], [Guitar solo], [Breakdown].
+
+      //           3. **Advanced Formatting**:
+      //              - Use asterisks, brackets, and capitalization for effects, structure, and instrumental emphasis.
+      //              - Examples: [Saxophone solo intro], [Increase intensity], [Crescendo], [Starts out quietly], [Emotional Bridge], etc.
+
+      //           4. **Chord Progressions**:
+      //              - Use tags to specify chord progressions like [Cmaj7], [Dm7], [G7], [A7].
+      //              - Use mood descriptors to guide the choice of scales, such as "smooth" for major scales.
+
+      //           5. **Natural Song Endings**:
+      //              - Use tags like [end], [fade out], [outro] to ensure a smooth and natural ending.
+
+      //           6. **Sound Effects**:
+      //              - Use prompts in brackets in uppercase to indicate specific sounds like [APPLAUSE FX], [AMBIENT CLUB NOISE FX].
+
+      //           7. **Detailed Prompts**:
+      //              - Include a high-level description and reference details in the <INSTRUMENTAL_DETAILS></INSTRUMENTAL_DETAILS> tag.
+      //              - Example:
+      //              <INSTRUMENTAL_DETAILS>
+      //               [GENRES: Smooth Jazz, Cool Jazz, Fusion]
+      //               [STYLE: Relaxing, Melodic, Improvisational, Clean]
+      //               [MOOD: Calm, Sophisticated, Reflective, Dreamy]
+      //               [ARRANGEMENT: Moderate tempo, Laid-back groove, Ethereal textures, Smooth melodies]
+      //               [INSTRUMENTATION: Saxophone, Piano, Double Bass, Drums, Trumpet]
+      //               [TEMPO: Moderate, 80-120 BPM]
+      //               [PRODUCTION: Warm tones, Clean mixing, Subtle compression]
+      //               [DYNAMICS: Gentle throughout, Gradual builds and releases, Smooth transitions]
+      //               [EMOTIONS: Sophistication, Contemplation, Tranquillity, Nostalgia]
+      //             </INSTRUMENTAL_DETAILS>
+      //           `,
+      //     },
+      //     {
+      //       role: 'user',
+      //       content: `Generate a jazz instrumental structure. Provide only the structure without any additional text.`,
+      //     },
+      //   ],
+      //   model: 'gpt-4o-mini',
+      // });
+
+      // const song = songCompletion.choices[0].message.content;
       job.progress(30);
 
       const [titleCompletion, tagsCompletion] = await Promise.all([
@@ -138,7 +138,7 @@ export class AppJobs {
             },
             {
               role: 'user',
-              content: `Generate tags for a jazz instrumental beat`,
+              content: `Generate tags for a chill hop jazz instrumental beat, easy to listen to, suitable for studying or relaxing, with hip hop elements.`,
             },
           ],
           model: 'gpt-4o-mini',
@@ -163,10 +163,10 @@ export class AppJobs {
       job.progress(50);
 
       const payload = {
-        prompt: song,
+        prompt: 'song',
         tags: tags,
         title: title,
-        make_instrumental: false,
+        make_instrumental: true,
         model: 'chirp-v3-5',
         wait_audio: false,
       };
