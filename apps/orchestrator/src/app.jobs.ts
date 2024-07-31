@@ -163,7 +163,7 @@ export class AppJobs {
       job.progress(50);
 
       const payload = {
-        prompt: 'song',
+        prompt: '[instrumental]',
         tags: tags,
         title: title,
         make_instrumental: true,
